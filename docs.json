@@ -23,7 +23,10 @@
       },
       {
         "tab": "API Reference",
-        "openapi": "https://api.gbase.ai/openapi-redoc.json"
+        "openapi": {
+          "source": "https://api.gbase.ai/openapi-redoc.json",
+          "directory": "api"
+        }
       }
     ]
   },
