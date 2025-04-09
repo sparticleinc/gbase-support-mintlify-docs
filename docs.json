@@ -22,11 +22,76 @@
         ]
       },
       {
+        "tab": "User Manual",
+        "groups": [
+          {
+            "group": "GBaseへようこそ",
+            "pages": [
+              "user-manual/quickstart",
+              {
+                "group": "マイボット",
+                "pages": [
+                  {
+                    "group": "ボット作成",
+                    "pages": [
+                      "user-manual/welcome/mybot/bot-creation/website",
+                      "user-manual/welcome/mybot/bot-creation/gitbook",
+                      "user-manual/welcome/mybot/bot-creation/sitemap",
+                      "user-manual/welcome/mybot/bot-creation/document",
+                      "user-manual/welcome/mybot/bot-creation/faq-list",
+                      "user-manual/welcome/mybot/bot-creation/integration"
+                    ]
+                  },
+                  "user-manual/welcome/mybot/tool-list",
+                  {
+                    "group": "ワークショップ",
+                    "pages": [
+                      "user-manual/welcome/mybot/workshop/dashboard",
+                      "user-manual/welcome/mybot/workshop/online-visitor",
+                      "user-manual/welcome/mybot/workshop/chat"
+                    ]
+                  },
+                  {
+                    "group": "カスタマイズ",
+                    "pages": [
+                      "user-manual/welcome/mybot/customize/widget-embed",
+                      "user-manual/welcome/mybot/customize/chat-history"
+                    ]
+                  },
+                  {
+                    "group": "設定",
+                    "pages": [
+                      "user-manual/welcome/mybot/setting/settings-general",
+                      "user-manual/welcome/mybot/setting/settings-details",
+                      "user-manual/welcome/mybot/setting/canvas",
+                      "user-manual/welcome/mybot/setting/prompt",
+                      "user-manual/welcome/mybot/setting/bot-delete"
+                    ]
+                  },
+                  {
+                    "group": "トレーニング",
+                    "pages":[
+                      "user-manual/welcome/mybot/training/data-dictionary",
+                      "user-manual/welcome/mybot/training/related-knowledge-base"
+                    ]
+                  }
+                ]
+              },
+              "user-manual/welcome/knowledge-base",
+              "user-manual/welcome/key",
+              "user-manual/welcome/manual",
+              "user-manual/welcome/collaboration-space",
+              "user-manual/welcome/access-management",
+              "user-manual/welcome/setting-language",
+              "user-manual/welcome/login-user",
+              "user-manual/welcome/api"
+            ]
+          }
+        ]
+      },
+      {
         "tab": "API Reference",
-        "openapi": {
-          "source": "https://api.gbase.ai/openapi-redoc.json",
-          "directory": "api"
-        }
+        "openapi": "https://api.gbase.ai/openapi-redoc.json"
       }
     ]
   },
