@@ -25,11 +25,11 @@
         "tab": "User Manual",
         "groups": [
           {
-            "group": "User Manual",
+            "group": "GBaseへようこそ",
             "pages": [
               "user-manual/quickstart",
               {
-                "group": "mybot",
+                "group": "マイボット",
                 "pages": [
                   {
                     "group": "ボット作成",
