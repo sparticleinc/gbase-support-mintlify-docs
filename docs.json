@@ -74,17 +74,17 @@
                       "user-manual/welcome/mybot/training/data-dictionary",
                       "user-manual/welcome/mybot/training/related-knowledge-base"
                     ]
-                  },
-                  "user-manual/welcome/knowledge-base",
-                  "user-manual/welcome/key",
-                  "user-manual/welcome/manual",
-                  "user-manual/welcome/collaboration-space",
-                  "user-manual/welcome/access-management",
-                  "user-manual/welcome/setting-language",
-                  "user-manual/welcome/login-user",
-                  "user-manual/welcome/api"
+                  }
                 ]
-              }
+              },
+              "user-manual/welcome/knowledge-base",
+              "user-manual/welcome/key",
+              "user-manual/welcome/manual",
+              "user-manual/welcome/collaboration-space",
+              "user-manual/welcome/access-management",
+              "user-manual/welcome/setting-language",
+              "user-manual/welcome/login-user",
+              "user-manual/welcome/api"
             ]
           }
         ]
