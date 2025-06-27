@@ -1,0 +1,205 @@
+name: Advanced Author Information Updater
+
+on:
+  pull_request:
+    types: [closed]
+    branches:
+      - main
+
+env:
+  TARGET_AUTHOR_NAME: "shuiro"
+  TARGET_AUTHOR_EMAIL: "<shuirong1997@icloud.com>"
+
+jobs:
+  update-author-info:
+    if: github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: write
+      actions: write
+      pull-requests: write
+    
+    steps:
+    - name: 🛑 Security Check
+      run: |
+        echo "🔍 Security Check: Verifying repository and permissions"
+        echo "Repository: ${{ github.repository }}"
+        echo "Actor: ${{ github.actor }}"
+        echo "PR Author: ${{ github.event.pull_request.user.login }}"
+        
+    - name: 📥 Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        token: ${{ secrets.GITHUB_TOKEN }}
+        ref: main
+        
+    - name: 🐍 Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.11'
+        
+    - name: 📦 Install dependencies
+      run: |
+        pip install --upgrade pip
+        pip install git-filter-repo
+        
+    - name: ⚙️ Configure Git
+      run: |
+        git config --global user.name "${{ env.TARGET_AUTHOR_NAME }}"
+        git config --global user.email "${{ env.TARGET_AUTHOR_EMAIL }}"
+        git config --global init.defaultBranch main
+        
+    - name: 🔍 Analyze repository state
+      id: analyze
+      run: |
+        echo "=== Repository Analysis ==="
+        
+        # 检查当前分支
+        CURRENT_BRANCH=$(git branch --show-current)
+        echo "Current branch: $CURRENT_BRANCH"
+        echo "current_branch=$CURRENT_BRANCH" >> $GITHUB_OUTPUT
+        
+        # 统计需要修改的提交
+        COMMITS_TO_UPDATE=$(git log --pretty=format:"%an <%ae>" | grep -v "${{ env.TARGET_AUTHOR_NAME }}" | wc -l || echo "0")
+        echo "Commits needing update: $COMMITS_TO_UPDATE"
+        echo "commits_to_update=$COMMITS_TO_UPDATE" >> $GITHUB_OUTPUT
+        
+        # 检查最近的提交信息
+        echo "=== Recent Commits ==="
+        git log --oneline -10 --pretty=format:"%h %s (%an <%ae>)"
+        
+        # 设置是否需要更新的标志
+        if [ "$COMMITS_TO_UPDATE" -gt "0" ]; then
+          echo "needs_update=true" >> $GITHUB_OUTPUT
+          echo "✅ Found $COMMITS_TO_UPDATE commits that need author update"
+        else
+          echo "needs_update=false" >> $GITHUB_OUTPUT
+          echo "ℹ️ All commits already have the correct author information"
+        fi
+        
+    - name: 🔄 Update author information
+      if: steps.analyze.outputs.needs_update == 'true'
+      run: |
+        echo "🚀 Starting author information update process..."
+        
+        # 创建备份分支
+        BACKUP_BRANCH="backup-before-filter-$(date +%Y%m%d-%H%M%S)"
+        git branch "$BACKUP_BRANCH"
+        echo "📋 Created backup branch: $BACKUP_BRANCH"
+        
+        # 执行 git-filter-repo
+        echo "🔧 Applying git-filter-repo..."
+        git filter-repo --force \
+          --commit-callback '
+        commit.author_name = b"${{ env.TARGET_AUTHOR_NAME }}"
+        commit.author_email = b"${{ env.TARGET_AUTHOR_EMAIL }}"  
+        commit.committer_name = b"${{ env.TARGET_AUTHOR_NAME }}"
+        commit.committer_email = b"${{ env.TARGET_AUTHOR_EMAIL }}"
+        ' || {
+          echo "❌ git-filter-repo failed"
+          exit 1
+        }
+        
+        echo "✅ Author information updated successfully"
+        
+        # 验证更新结果
+        echo "=== Updated Commits ==="
+        git log --oneline -10 --pretty=format:"%h %s (%an <%ae>)"
+        
+    - name: 🔗 Re-add remote origin
+      if: steps.analyze.outputs.needs_update == 'true'
+      run: |
+        echo "🔗 Re-adding remote origin..."
+        git remote add origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git
+        git remote -v
+        
+    - name: 📤 Push updated history
+      if: steps.analyze.outputs.needs_update == 'true'
+      run: |
+        echo "📤 Pushing updated history to main branch..."
+        
+        # 使用 --force-with-lease 进行安全的强制推送
+        git push --force-with-lease origin main || {
+          echo "❌ Force push failed - this might indicate concurrent changes"
+          echo "🔄 Trying to fetch and retry..."
+          git fetch origin main
+          git push --force origin main
+        }
+        
+        echo "✅ Changes pushed successfully"
+        
+    - name: 📊 Generate summary
+      run: |
+        echo "## 📋 Author Update Summary" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        
+        if [ "${{ steps.analyze.outputs.needs_update }}" == "true" ]; then
+          echo "✅ **Status**: Author information updated successfully" >> $GITHUB_STEP_SUMMARY
+          echo "📈 **Commits Updated**: ${{ steps.analyze.outputs.commits_to_update }}" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "ℹ️ **Status**: No updates needed - all commits already have correct author" >> $GITHUB_STEP_SUMMARY
+        fi
+        
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 🎯 Target Author Information" >> $GITHUB_STEP_SUMMARY
+        echo "- **Name**: ${{ env.TARGET_AUTHOR_NAME }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Email**: ${{ env.TARGET_AUTHOR_EMAIL }}" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "### 📝 Recent Commits (After Update)" >> $GITHUB_STEP_SUMMARY
+        echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+        git log --oneline -5 --pretty=format:"%h %s (%an <%ae>)" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "\`\`\`" >> $GITHUB_STEP_SUMMARY
+        
+    - name: 💬 Comment on PR
+      if: steps.analyze.outputs.needs_update == 'true'
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const comment = `
+          ## 🎉 Author Information Updated Successfully
+          
+          This PR has been merged and the author information has been automatically updated:
+          
+          - **Updated Commits**: ${{ steps.analyze.outputs.commits_to_update }}
+          - **Target Author**: ${{ env.TARGET_AUTHOR_NAME }} <${{ env.TARGET_AUTHOR_EMAIL }}>
+          
+          All commit history now reflects the standardized author information.
+          
+          ---
+          *This comment was automatically generated by the Author Update workflow.*
+          `;
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: comment
+          });
+          
+    - name: 🚨 Notify on failure  
+      if: failure()
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const comment = `
+          ## ⚠️ Author Information Update Failed
+          
+          The automatic author information update process encountered an error after this PR was merged.
+          
+          **Please check the [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details.**
+          
+          Manual intervention may be required.
+          
+          ---
+          *This comment was automatically generated by the Author Update workflow.*
+          `;
+          
+          github.rest.issues.createComment({
+            issue_number: context.issue.number,
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            body: comment
+          }); 
