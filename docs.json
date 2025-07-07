@@ -7,7 +7,7 @@
     "light": "#07C983",
     "dark": "#15803D"
   },
-  "favicon": "/favicon.ico",
+  "favicon": "/logo/logo.svg",
   "navigation": {
     "tabs": [
       {
@@ -70,7 +70,7 @@
                   },
                   {
                     "group": "トレーニング",
-                    "pages":[
+                    "pages": [
                       "user-manual/welcome/mybot/training/data-dictionary",
                       "user-manual/welcome/mybot/training/related-knowledge-base"
                     ]
