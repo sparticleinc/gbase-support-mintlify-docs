@@ -1,3 +1,8 @@
+### GBase Knowledge Doc 
+网站：gbaseknowledge.mintlify.app
+文档仓库在另一个 support@sparticle.com 的Github账户上，两步认证绑定在shuirong的手机上。
+
+
 # GBase docs
 
 
