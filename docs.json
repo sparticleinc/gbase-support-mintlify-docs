@@ -91,6 +91,25 @@
         ]
       },
       {
+        "tab": "Knowledge Manual",
+        "groups": [
+          {
+            "group": "GBase Knowledge マニュアル",
+            "pages": [
+              "knowledge/quickstart",
+              "knowledge/meeting-notes",
+              "knowledge/ai-slides",
+              "knowledge/agent-search",
+              "knowledge/projects",
+              "knowledge/skills",
+              "knowledge/settings",
+              "knowledge/admin",
+              "knowledge/faq"
+            ]
+          }
+        ]
+      },
+      {
         "tab": "API Reference",
         "openapi": "https://api.gbase.ai/openapi-redoc.json"
       }
